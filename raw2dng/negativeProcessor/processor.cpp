@@ -20,11 +20,11 @@
    Mueller (tschensinger at gmx dot de)
 */
 
-#include "negativeProcessor.h"
-#include "vendorProcessors/DNGprocessor.h"
-#include "vendorProcessors/ILCE7processor.h"
-#include "vendorProcessors/FujiProcessor.h"
-#include "vendorProcessors/variousVendorProcessor.h"
+#include "processor.h"
+#include "DNGprocessor.h"
+#include "ILCE7processor.h"
+#include "FujiProcessor.h"
+#include "variousVendorProcessor.h"
 
 #include <stdexcept>
 

@@ -35,7 +35,7 @@
 #include "dng_xmp.h"
 #include "dng_color_space.h"
 
-#include "negativeProcessor.h"
+#include "negativeProcessor/processor.h"
 #include "dnghost.h"
 
 

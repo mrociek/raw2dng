@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "../negativeProcessor.h"
+#include "processor.h"
 
 
 class VariousVendorProcessor : public NegativeProcessor {

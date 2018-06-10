@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "negativeProcessor.h"
+#include "negativeProcessor/processor.h"
 
 #include <string>
 

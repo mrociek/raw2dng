@@ -32,12 +32,12 @@ INCLUDE_DIRECTORIES( ${raw2dng_SOURCE_DIR}/libdng
 
 ADD_EXECUTABLE( raw2dng
                 ${CMAKE_CURRENT_SOURCE_DIR}/raw2dng.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/rawConverter.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/vendorProcessors/DNGprocessor.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/vendorProcessors/ILCE7processor.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/vendorProcessors/FujiProcessor.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/vendorProcessors/variousVendorProcessor.cpp )
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/processor.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/DNGprocessor.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/ILCE7processor.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/FujiProcessor.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/variousVendorProcessor.cpp )
 
 TARGET_LINK_LIBRARIES( raw2dng dng ${ZLIB_LIBRARIES} ${LIBRAW_LIBRARIES} ${EXIV2_LIBRARIES} )
 TARGET_COMPILE_OPTIONS( raw2dng PRIVATE -fexceptions -std=c++11 )

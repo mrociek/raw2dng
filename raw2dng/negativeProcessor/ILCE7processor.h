@@ -18,20 +18,19 @@
 
 #pragma once
 
-#include "../negativeProcessor.h"
+#include "processor.h"
 
 
-class DNGprocessor : public NegativeProcessor {
+class ILCE7processor : public NegativeProcessor {
 friend class NegativeProcessor;
 
 public:
    void setDNGPropertiesFromRaw();
-   void setCameraProfile(const char *dcpFilename);
    void setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
    void setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
-   void backupProprietaryData();
-   void buildDNGImage();
 
 protected:
-   DNGprocessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+   ILCE7processor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+
+   dng_memory_stream* createDNGPrivateTag();
 };
