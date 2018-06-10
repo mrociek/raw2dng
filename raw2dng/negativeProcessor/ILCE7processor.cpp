@@ -171,8 +171,8 @@ void ILCE7processor::setDNGPropertiesFromRaw() {
     // Adjust default crop
 
     uint32 cropWidth, cropHeight;
-    if (getRawExifTag("Exif.Sony2.FullImageSize", 0, &cropHeight) && 
-        getRawExifTag("Exif.Sony2.FullImageSize", 1, &cropWidth)) {
+    if (getInputExifTag("Exif.Sony2.FullImageSize", 0, &cropHeight) && 
+        getInputExifTag("Exif.Sony2.FullImageSize", 1, &cropWidth)) {
 
         int frameH = (cropWidth > m_RawProcessor->imgdata.sizes.width ) ? 0 : m_RawProcessor->imgdata.sizes.width  - cropWidth;
         int frameV = (cropHeight > m_RawProcessor->imgdata.sizes.height) ? 0 : m_RawProcessor->imgdata.sizes.height - cropHeight;
@@ -185,7 +185,7 @@ void ILCE7processor::setDNGPropertiesFromRaw() {
     // Read Sony's embedded CA-correction data and write WarpRectilinear opcodes
 
     int16 tag_CA_plane[33];
-    if (getRawExifTag("Exif.SubImage1.0x7035", tag_CA_plane, 33) == 33) {
+    if (getInputExifTag("Exif.SubImage1.0x7035", tag_CA_plane, 33) == 33) {
         dng_vector radialParams[3];
         dng_vector tangentialParams[3];
 
@@ -282,7 +282,7 @@ void ILCE7processor::setXmpFromRaw(const dng_date_time_info &dateTimeNow, const 
     // Read Sony's embedded lens distortion correction data
 
     int16 tag_distortion[17];
-    if (getRawExifTag("Exif.SubImage1.0x7037", tag_distortion, 17) == 17) {
+    if (getInputExifTag("Exif.SubImage1.0x7037", tag_distortion, 17) == 17) {
        real64 lensDistortInfo[4];
 
         for (int param = 0; param < 4; param++) {
@@ -311,7 +311,7 @@ dng_memory_stream* ILCE7processor::createDNGPrivateTag() {
 
     long dpdLength;
     unsigned char *dpdBuffer;
-    if (!getRawExifTag("Exif.Image.DNGPrivateData", &dpdLength, &dpdBuffer)) return streamPriv;
+    if (!getInputExifTag("Exif.Image.DNGPrivateData", &dpdLength, &dpdBuffer)) return streamPriv;
 
     uint32_t SR2offset = (dpdBuffer[0] & 0xFF)       | (dpdBuffer[1] & 0xFF) << 8  | 
                          (dpdBuffer[2] & 0xFF) << 16 | (dpdBuffer[3] & 0xFF) << 24;

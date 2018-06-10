@@ -49,19 +49,19 @@ protected:
    virtual dng_memory_stream* createDNGPrivateTag();
 
    // helper functions
-   bool getInterpretedRawExifTag(const char* exifTagName, int32 component, uint32* value);
+   bool getInterpretedInputExifTag(const char* exifTagName, int32 component, uint32* value);
 
-   bool getRawExifTag(const char* exifTagName, dng_string* value);
-   bool getRawExifTag(const char* exifTagName, dng_date_time_info* value);
-   bool getRawExifTag(const char* exifTagName, int32 component, dng_srational* rational);
-   bool getRawExifTag(const char* exifTagName, int32 component, dng_urational* rational);
-   bool getRawExifTag(const char* exifTagName, int32 component, uint32* value);
+   bool getInputExifTag(const char* exifTagName, dng_string* value);
+   bool getInputExifTag(const char* exifTagName, dng_date_time_info* value);
+   bool getInputExifTag(const char* exifTagName, int32 component, dng_srational* rational);
+   bool getInputExifTag(const char* exifTagName, int32 component, dng_urational* rational);
+   bool getInputExifTag(const char* exifTagName, int32 component, uint32* value);
 
-   int  getRawExifTag(const char* exifTagName, uint32* valueArray, int32 maxFill);
-   int  getRawExifTag(const char* exifTagName, int16* valueArray, int32 maxFill);
-   int  getRawExifTag(const char* exifTagName, dng_urational* valueArray, int32 maxFill);
+   int  getInputExifTag(const char* exifTagName, uint32* valueArray, int32 maxFill);
+   int  getInputExifTag(const char* exifTagName, int16* valueArray, int32 maxFill);
+   int  getInputExifTag(const char* exifTagName, dng_urational* valueArray, int32 maxFill);
 
-   bool getRawExifTag(const char* exifTagName, long* size, unsigned char** data);
+   bool getInputExifTag(const char* exifTagName, long* size, unsigned char** data);
 
    // Source: Raw-file
    AutoPtr<LibRaw> m_RawProcessor;
