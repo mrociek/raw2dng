@@ -16,7 +16,7 @@
    Boston, MA 02110-1301, USA.
 */
 
-#include "ILCE7processor.h"
+#include "ILCE7.h"
 
 #include <exception>
 #include <stdexcept>

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "processor.h"
+#include "../processor.h"
 
 
 // TODO/FIXME: Fuji support is currently broken!

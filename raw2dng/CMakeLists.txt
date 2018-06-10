@@ -35,8 +35,8 @@ ADD_EXECUTABLE( raw2dng
                 ${CMAKE_CURRENT_SOURCE_DIR}/rawConverter.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/processor.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/DNGprocessor.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/ILCE7processor.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/FujiProcessor.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/sony/ILCE7.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/fuji/common.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/negativeProcessor/variousVendorProcessor.cpp )
 
 TARGET_LINK_LIBRARIES( raw2dng dng ${ZLIB_LIBRARIES} ${LIBRAW_LIBRARIES} ${EXIV2_LIBRARIES} )

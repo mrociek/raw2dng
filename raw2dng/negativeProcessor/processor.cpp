@@ -22,8 +22,8 @@
 
 #include "processor.h"
 #include "DNGprocessor.h"
-#include "ILCE7processor.h"
-#include "FujiProcessor.h"
+#include "sony/ILCE7.h"
+#include "fuji/common.h"
 #include "variousVendorProcessor.h"
 
 #include <stdexcept>

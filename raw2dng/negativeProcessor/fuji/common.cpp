@@ -24,7 +24,7 @@
 
 #include <libraw/libraw.h>
 
-#include "FujiProcessor.h"
+#include "common.h"
 
 
 // TODO/FIXME: Fuji support is currently broken!
