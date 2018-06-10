@@ -21,7 +21,7 @@
 */
 
 #include "processor.h"
-#include "DNGprocessor.h"
+#include "dng_input.h"
 #include "sony/ILCE7.h"
 #include "fuji/common.h"
 #include "variousVendorProcessor.h"
