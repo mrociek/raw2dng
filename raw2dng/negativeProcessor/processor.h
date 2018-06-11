@@ -22,6 +22,7 @@
 #include <dng_negative.h>
 #include <dng_exif.h>
 #include <exiv2/image.hpp>
+#include <libraw/libraw.h>
 
 class LibRaw;
 
@@ -63,11 +64,15 @@ protected:
 
    bool getInputExifTag(const char* exifTagName, long* size, unsigned char** data);
 
+   virtual libraw_image_sizes_t* getSizeInfo() = 0;
+   virtual libraw_iparams_t* getImageParams() = 0;
+   virtual libraw_colordata_t* getColorData() = 0;
+
    // Source: Raw-file
    AutoPtr<LibRaw> m_RawProcessor;
-   Exiv2::Image::AutoPtr m_RawImage;
-   Exiv2::ExifData m_RawExif;
-   Exiv2::XmpData m_RawXmp;
+   Exiv2::Image::AutoPtr m_InputImage;
+   Exiv2::ExifData m_InputExif;
+   Exiv2::XmpData m_InputXmp;
 
    // Target: DNG-file
    AutoPtr<dng_host> &m_host;

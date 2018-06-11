@@ -21,8 +21,7 @@
 #include "processor.h"
 
 
-class VariousVendorProcessor : public NegativeProcessor {
-friend class NegativeProcessor;
+class VariousVendorProcessor : VendorRawProcessor {
 
 public:
    void setDNGPropertiesFromRaw();

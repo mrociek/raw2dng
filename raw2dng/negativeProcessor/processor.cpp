@@ -36,9 +36,7 @@
 
 #include <zlib.h>
 
-#include <exiv2/image.hpp>
 #include <exiv2/xmp.hpp>
-#include <libraw/libraw.h>
 
 const char* getDngErrorMessage(int errorCode) {
     switch (errorCode) {
@@ -141,9 +139,10 @@ ColorKeyCode colorKey(const char color) {
 }
 
 
-void NegativeProcessor::setDNGPropertiesFromRaw() {
-    libraw_image_sizes_t *sizes   = &m_RawProcessor->imgdata.sizes;
-    libraw_iparams_t     *iparams = &m_RawProcessor->imgdata.idata;
+void NegativeProcessor::setDNGPropertiesFromInput() {
+    libraw_image_sizes_t *sizes   = getSizeInfo();
+    libraw_iparams_t *iparams = getImageParams();
+    libraw_colordata_t *colors  = getColorData();
 
     // -----------------------------------------------------------------------------------------
     // Raw filename
@@ -225,8 +224,6 @@ void NegativeProcessor::setDNGPropertiesFromRaw() {
 
     // -----------------------------------------------------------------------------------------
     // BlackLevel & WhiteLevel
-
-    libraw_colordata_t *colors  = &m_RawProcessor->imgdata.color;
 
     for (int i = 0; i < 4; i++)
 	    m_negative->SetWhiteLevel(static_cast<uint32>(colors->maximum), i);
@@ -575,7 +572,7 @@ dng_memory_stream* NegativeProcessor::createDNGPrivateTag() {
 
 
 void NegativeProcessor::buildDNGImage() {
-    libraw_image_sizes_t *sizes = &m_RawProcessor->imgdata.sizes;
+    libraw_image_sizes_t *sizes   = getSizeInfo();
 
     // -----------------------------------------------------------------------------------------
     // Select right data source from LibRaw

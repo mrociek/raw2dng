@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 Fimagena
+/* Copyright (C) 2018 Dmitrii Nikishov
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,19 +18,19 @@
 
 #pragma once
 
-#include "../processor.h"
+#include <dng_host.h>
+#include <dng_negative.h>
+#include <dng_exif.h>
+#include <exiv2/image.hpp>
 
+class LibRaw;
 
-// TODO/FIXME: Fuji support is currently broken!
-
-class FujiProcessor : VendorRawProcessor {
-
+class VendorRawProcessor : NegativeProcessor {
 public:
-   void setDNGPropertiesFromRaw();
-   void buildDNGImage();
-
 protected:
-   FujiProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+    libraw_image_sizes_t* getSizeInfo() override;
+    libraw_iparams_t* getImageParams() override;
+    libraw_colordata_t* getColorData() override;
 
-   bool m_fujiRotate90;
+    AutoPtr<LibRaw> m_RawProcessor;
 };

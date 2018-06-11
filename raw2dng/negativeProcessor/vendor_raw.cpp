@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 Fimagena
+/* Copyright (C) 2018 Dmitry Nikishov
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -14,23 +14,29 @@
    along with this library; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
+
+   This file uses code from dngconvert from Jens Mueller and others
+   (https://github.com/jmue/dngconvert) - Copyright (C) 2011 Jens 
+   Mueller (tschensinger at gmx dot de)
 */
 
-#pragma once
 
-#include "../processor.h"
+#include "processor.h"
 
 
-// TODO/FIXME: Fuji support is currently broken!
+libraw_image_sizes_t* VendorRawProcessor::getSizeInfo()
+{
+    return &m_RawProcessor->imgdata.sizes;
+}
 
-class FujiProcessor : VendorRawProcessor {
 
-public:
-   void setDNGPropertiesFromRaw();
-   void buildDNGImage();
+libraw_iparams_t* VendorRawProcessor::getImageParams()
+{
+    return &m_RawProcessor->imgdata.idata;
+}
 
-protected:
-   FujiProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
 
-   bool m_fujiRotate90;
-};
+libraw_colordata_t* VendorRawProcessor::getColorData()
+{
+    return &m_RawProcessor->imgdata.color;
+}
