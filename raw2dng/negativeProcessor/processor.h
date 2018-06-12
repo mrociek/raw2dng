@@ -22,7 +22,8 @@
 #include <dng_negative.h>
 #include <dng_exif.h>
 #include <exiv2/image.hpp>
-#include <libraw/libraw.h>
+#include <libraw/libraw_types.h>
+
 
 class LibRaw;
 
@@ -30,51 +31,28 @@ const char* getDngErrorMessage(int errorCode);
 
 class NegativeProcessor {
 public:
-   static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, const char *filename);
-   virtual ~NegativeProcessor();
+   static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, std::string& filename);
+   static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, std::string& filename, std::string& jpgFilename);
+   //virtual ~NegativeProcessor();
 
    dng_negative* getNegative() {return m_negative.Get();}
 
    // Different raw/DNG processing stages - usually called in this sequence
-   virtual void setDNGPropertiesFromRaw();
-   virtual void setCameraProfile(const char *dcpFilename);
-   virtual void setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
-   virtual void setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
-   virtual void backupProprietaryData();
-   virtual void buildDNGImage();
-   virtual void embedOriginalRaw(const char *rawFilename);
+   virtual void setDNGPropertiesFromInput() = 0;
+   virtual void setCameraProfile(const char *dcpFilename) = 0;
+   virtual void setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) = 0;
+   virtual void setXmpFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) = 0;
+   virtual void backupProprietaryData() = 0;
+   virtual void buildDNGImage() = 0;
+   virtual void embedOriginalFile(const char *rawFilename);
 
 protected:
-   NegativeProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
-
-   virtual dng_memory_stream* createDNGPrivateTag();
-
-   // helper functions
-   bool getInterpretedInputExifTag(const char* exifTagName, int32 component, uint32* value);
-
-   bool getInputExifTag(const char* exifTagName, dng_string* value);
-   bool getInputExifTag(const char* exifTagName, dng_date_time_info* value);
-   bool getInputExifTag(const char* exifTagName, int32 component, dng_srational* rational);
-   bool getInputExifTag(const char* exifTagName, int32 component, dng_urational* rational);
-   bool getInputExifTag(const char* exifTagName, int32 component, uint32* value);
-
-   int  getInputExifTag(const char* exifTagName, uint32* valueArray, int32 maxFill);
-   int  getInputExifTag(const char* exifTagName, int16* valueArray, int32 maxFill);
-   int  getInputExifTag(const char* exifTagName, dng_urational* valueArray, int32 maxFill);
-
-   bool getInputExifTag(const char* exifTagName, long* size, unsigned char** data);
-
-   virtual libraw_image_sizes_t* getSizeInfo() = 0;
-   virtual libraw_iparams_t* getImageParams() = 0;
-   virtual libraw_colordata_t* getColorData() = 0;
-
-   // Source: Raw-file
-   AutoPtr<LibRaw> m_RawProcessor;
-   Exiv2::Image::AutoPtr m_InputImage;
-   Exiv2::ExifData m_InputExif;
-   Exiv2::XmpData m_InputXmp;
+   NegativeProcessor(AutoPtr<dng_host> &host, std::string filename);
+   // Overloaded builder method to be used with Xiaomi Yi files
+   NegativeProcessor(AutoPtr<dng_host> &host, std::string filename, std::string jpgFilename);
 
    // Target: DNG-file
    AutoPtr<dng_host> &m_host;
    AutoPtr<dng_negative> m_negative;
+   std::string m_inputFileName;
 };

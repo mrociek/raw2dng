@@ -21,7 +21,33 @@
 */
 
 
-#include "processor.h"
+#include "vendor_raw.h"
+
+#include <stdexcept>
+
+#include <dng_simple_image.h>
+#include <dng_camera_profile.h>
+#include <dng_file_stream.h>
+#include <dng_memory_stream.h>
+#include <dng_xmp.h>
+
+#include <zlib.h>
+
+#include <exiv2/xmp.hpp>
+#include <libraw/libraw.h>
+
+
+VendorRawProcessor::VendorRawProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor):
+    RawExiv2Processor(host, filename, inputImage),
+    m_RawProcessor(rawProcessor)
+{
+    m_negative.Reset(m_host->Make_dng_negative());
+}
+
+
+VendorRawProcessor::~VendorRawProcessor() {
+	m_RawProcessor->recycle();
+}
 
 
 libraw_image_sizes_t* VendorRawProcessor::getSizeInfo()
@@ -39,4 +65,36 @@ libraw_iparams_t* VendorRawProcessor::getImageParams()
 libraw_colordata_t* VendorRawProcessor::getColorData()
 {
     return &m_RawProcessor->imgdata.color;
+}
+
+
+unsigned short* VendorRawProcessor::getRawBuffer() 
+{
+    unsigned short *rawBuffer = (unsigned short*) m_RawProcessor->imgdata.rawdata.raw_image;
+
+    if (rawBuffer == NULL) {
+        rawBuffer = (unsigned short*) m_RawProcessor->imgdata.rawdata.color3_image;
+    }
+    if (rawBuffer == NULL) {
+        rawBuffer = (unsigned short*) m_RawProcessor->imgdata.rawdata.color4_image;
+    }
+    return rawBuffer;
+}
+
+
+uint32 VendorRawProcessor::getInputPlanes()
+{
+    if (m_RawProcessor->imgdata.rawdata.raw_image != NULL)
+    {
+        return 1;
+    }
+    else if (m_RawProcessor->imgdata.rawdata.raw_image == NULL &&
+             m_RawProcessor->imgdata.rawdata.color3_image != NULL)
+    {
+        return 3;
+    }
+    else
+    {
+        return 4;
+    }
 }

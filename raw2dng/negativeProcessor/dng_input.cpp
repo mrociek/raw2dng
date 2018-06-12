@@ -28,15 +28,11 @@
 #include <exiv2/image.hpp>
 
 
-DNGprocessor::DNGprocessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage)
-                             : NegativeProcessor(host, rawProcessor, rawImage) {
-    // -----------------------------------------------------------------------------------------
+DNGprocessor::DNGprocessor(AutoPtr<dng_host> &host, std::string filename)
+                             : NegativeProcessor(host, filename) {
     // Re-read source DNG using DNG SDK - we're ignoring the LibRaw/Exiv2 data structures from now on
-
-    std::string file(m_RawImage->io().path());
-
     try {
-        dng_file_stream stream(file.c_str());
+        dng_file_stream stream(m_inputFileName.c_str());
 
         dng_info info;
         info.Parse(*(m_host.Get()), stream);
@@ -54,14 +50,11 @@ DNGprocessor::DNGprocessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2:
 }
 
 
-void DNGprocessor::setDNGPropertiesFromRaw() {
-    // -----------------------------------------------------------------------------------------
-    // Raw filename
-
-    std::string file(m_RawImage->io().path());
-    size_t found = std::min(file.rfind("\\"), file.rfind("/"));
-    if (found != std::string::npos) file = file.substr(found + 1, file.length() - found - 1);
-    m_negative->SetOriginalRawFileName(file.c_str());
+void DNGprocessor::setDNGPropertiesFromInput() {
+    // Raw m_inputFileNamename
+    size_t found = std::min(m_inputFileName.rfind("\\"), m_inputFileName.rfind("/"));
+    if (found != std::string::npos) m_inputFileName = m_inputFileName.substr(found + 1, m_inputFileName.length() - found - 1);
+    m_negative->SetOriginalRawFileName(m_inputFileName.c_str());
 }
 
 
@@ -71,30 +64,25 @@ void DNGprocessor::setCameraProfile(const char *dcpFilename) {
     if (strlen(dcpFilename) > 0) {
         dng_file_stream profStream(dcpFilename);
         if (!prof->ParseExtended(profStream))
-            throw std::runtime_error("Could not parse supplied camera profile file!");
+            throw std::runtime_error("Could not parse supplied camera prom_inputFileName m_inputFileName!");
         m_negative->AddProfile(prof);
     }
     else {
-        // -----------------------------------------------------------------------------------------
         // Don't do anything, since we're using whatever's already in the DNG
     }
 }
 
 
-void DNGprocessor::setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
-    // -----------------------------------------------------------------------------------------
+void DNGprocessor::setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
     // We use whatever's in the source DNG and just update date and software
-
     dng_exif *negExif = m_negative->GetExif();
     negExif->fDateTime = dateTimeNow;
     negExif->fSoftware = appNameVersion;
 }
 
 
-void DNGprocessor::setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
-    // -----------------------------------------------------------------------------------------
+void DNGprocessor::setXmpFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
     // We use whatever's in the source DNG and just update some base tags
-
     dng_xmp *negXmp = m_negative->GetXMP();
     negXmp->UpdateDateTime(dateTimeNow);
     negXmp->UpdateMetadataDate(dateTimeNow);
@@ -105,12 +93,10 @@ void DNGprocessor::setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dn
 
 
 void DNGprocessor::backupProprietaryData() {
-    // -----------------------------------------------------------------------------------------
     // No-op, we use whatever's in the source DNG
 }
 
 
 void DNGprocessor::buildDNGImage() {
-    // -----------------------------------------------------------------------------------------
     // No-op, since we've already read the stage 1 image
 }

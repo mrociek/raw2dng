@@ -34,6 +34,7 @@ public:
    virtual ~RawConverter();
 
    void openRawFile(const std::string rawFilename);
+   void openRawFile(const std::string rawFilename, const std::string xiaomiJpgFilename);
    void buildNegative(const std::string dcpFilename);
    void embedRaw(const std::string rawFilename);
    void renderImage();

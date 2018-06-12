@@ -39,6 +39,16 @@ void raw2dng(std::string rawFilename, std::string outFilename, std::string dcpFi
 }
 
 
+void xiaomi_raw2dng(std::string rawFilename, std::string jpgFilename, std::string outFilename, std::string dcpFilename) {
+    RawConverter converter;
+    converter.openRawFile(rawFilename, jpgFilename);
+    converter.buildNegative(dcpFilename);
+    converter.renderImage();
+    converter.renderPreviews();
+    converter.writeDng(outFilename);
+}
+
+
 void raw2tiff(std::string rawFilename, std::string outFilename, std::string dcpFilename) {
     RawConverter converter;
     converter.openRawFile(rawFilename);
@@ -66,6 +76,7 @@ int main(int argc, const char* argv []) {
                      "Valid options:\n"
                      "  -dcp <filename>      use adobe camera profile\n"
                      "  -e                   embed original\n"
+                     "  -a7 <filename>       convert RAW from Ambarella A7-based cameras, requires a jpg file for exif data source\n"
                      "  -j                   convert to JPEG instead of DNG\n"
                      "  -t                   convert to TIFF instead of DNG\n"
                      "  -o <filename>        specify output filename\n\n";
@@ -77,6 +88,7 @@ int main(int argc, const char* argv []) {
 
     std::string outFilename;
     std::string dcpFilename;
+    std::string jpgFilename;
     bool embedOriginal = false, isJpeg = false, isTiff = false;
 
     int index;
@@ -84,6 +96,7 @@ int main(int argc, const char* argv []) {
         std::string option = &argv[index][1];
         if (0 == strcmp(option.c_str(), "o"))   outFilename = std::string(argv[++index]);
         if (0 == strcmp(option.c_str(), "dcp")) dcpFilename = std::string(argv[++index]);
+        if (0 == strcmp(option.c_str(), "a7")) jpgFilename = std::string(argv[++index]);
         if (0 == strcmp(option.c_str(), "e"))   embedOriginal = true;
         if (0 == strcmp(option.c_str(), "j"))   isJpeg = true;
         if (0 == strcmp(option.c_str(), "t"))   isTiff = true;
@@ -115,7 +128,8 @@ int main(int argc, const char* argv []) {
     try {
         if (isJpeg)      raw2jpeg(rawFilename, outFilename, dcpFilename);
         else if (isTiff) raw2tiff(rawFilename, outFilename, dcpFilename);
-        else             raw2dng (rawFilename, outFilename, dcpFilename, embedOriginal);
+        else if (jpgFilename.empty()) raw2dng (rawFilename, outFilename, dcpFilename, embedOriginal);
+        else xiaomi_raw2dng(rawFilename, jpgFilename, outFilename, dcpFilename);
     }
     catch (std::exception& e) {
         std::cerr << "--> Error! (" << e.what() << ")\n\n";

@@ -29,8 +29,9 @@
 #include "variousVendorProcessor.h"
 
 
-VariousVendorProcessor::VariousVendorProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage)
-                                             : NegativeProcessor(host, rawProcessor, rawImage) {}
+VariousVendorProcessor::VariousVendorProcessor(AutoPtr<dng_host> &host,std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor):
+    VendorRawProcessor(host, filename, inputImage, rawProcessor)
+{}
 
 
 void setString(uint32 inInt, dng_string *outString) {
@@ -40,15 +41,13 @@ void setString(uint32 inInt, dng_string *outString) {
 }
 
 
-void VariousVendorProcessor::setDNGPropertiesFromRaw() {
-    NegativeProcessor::setDNGPropertiesFromRaw();
+void VariousVendorProcessor::setDNGPropertiesFromInput() {
+    VendorRawProcessor::setDNGPropertiesFromInput();
 
-    // -----------------------------------------------------------------------------------------
     // Vendor specific crop size data
-
     uint32 cropWidth = 1 >> 30, cropHeight = 1 >> 30, leftMargin = 1 >> 30, topMargin = 1 >> 30;
 
-    // Nikon -----------------------------------------------------------------------------------
+    // Nikon
     uint32 nikonCrop[16];
     if (getInputExifTag("Exif.Nikon3.CropHiSpeed", nikonCrop, 7) == 7) {
         // TODO: this seems to be actually the activearea?
@@ -63,11 +62,11 @@ void VariousVendorProcessor::setDNGPropertiesFromRaw() {
         cropHeight = (nikonCrop[11] >> 24) + (nikonCrop[10] >> 16) + (nikonCrop[ 9] >> 8) + nikonCrop[ 8];
     }
 
-    // Sony ------------------------------------------------------------------------------------
+    // Sony
     getInputExifTag("Exif.Sony2.FullImageSize", 0, &cropHeight);
     getInputExifTag("Exif.Sony2.FullImageSize", 1, &cropWidth);
 
-    // Olympus ---------------------------------------------------------------------------------
+    // Olympus
     getInputExifTag("Exif.Olympus.ImageWidth", 0, &cropWidth);
     getInputExifTag("Exif.Olympus.ImageHeight", 0, &cropHeight);
 
@@ -81,16 +80,15 @@ void VariousVendorProcessor::setDNGPropertiesFromRaw() {
     getInputExifTag("Exif.OlympusRi.CropWidth", 0, &cropWidth);
     getInputExifTag("Exif.OlympusRi.CropHeight", 0, &cropHeight);
 
-    // Pentax ----------------------------------------------------------------------------------
+    // Pentax
     getInputExifTag("Exif.Pentax.RawImageSize", 0, &cropWidth);
     getInputExifTag("Exif.Pentax.RawImageSize", 1, &cropHeight);
 
-    // Panasonic -------------------------------------------------------------------------------
+    // Pentax
     getInputExifTag("Exif.Panasonic.ImageWidth", 0, &cropWidth);
     getInputExifTag("Exif.Panasonic.ImageHeight", 0, &cropHeight);
 
-    // Set crop --------------------------------------------------------------------------------
-    // this looks complicated but just checks that we're in bounds before setting crop 
+    // Crop
     if ((cropWidth != 1 >> 30) && (cropHeight != 1>> 30)) {
         if ((leftMargin == 1 >>30) && (cropWidth <= m_RawProcessor->imgdata.sizes.width))
             leftMargin = (m_RawProcessor->imgdata.sizes.width - cropWidth) / 2;
@@ -105,21 +103,17 @@ void VariousVendorProcessor::setDNGPropertiesFromRaw() {
 }
 
 
-void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
-    NegativeProcessor::setExifFromRaw(dateTimeNow, appNameVersion);
+void VariousVendorProcessor::setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
+    VendorRawProcessor::setExifFromInput(dateTimeNow, appNameVersion);
 
     dng_exif *negExif = m_negative->GetExif();
 
-    // -----------------------------------------------------------------------------------------
     // Read various proprietary MakerNote information and adjust Exif. This is not complete
     // (Exiv2 can decode more than this) but better than nothing
-
     uint32 tmp_uint32 = 0;
     dng_urational tmp_urat(0, 0);
 
-    // -----------------------------------------------------------------------------------------
     // Nikon Makernotes
-
     getInputExifTag("Exif.Nikon3.Lens", negExif->fLensInfo, 4);
     if (getInputExifTag("Exif.NikonLd1.LensIDNumber", 0, &tmp_uint32)) setString(tmp_uint32, &negExif->fLensID);
     if (getInputExifTag("Exif.NikonLd2.LensIDNumber", 0, &tmp_uint32)) setString(tmp_uint32, &negExif->fLensID);
@@ -144,9 +138,7 @@ void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNo
         getInputExifTag("Exif.Nikon3.ISOSpeed", 1, &negExif->fISOSpeedRatings[0]);
     }
 
-    // -----------------------------------------------------------------------------------------
     // Canon Makernotes
-
     if (getInputExifTag("Exif.CanonCs.MaxAperture", 0, &tmp_uint32)) negExif->fMaxApertureValue = dng_urational(tmp_uint32, 32);
     if (getInputExifTag("Exif.CanonSi.SubjectDistance", 0, &tmp_uint32) && (tmp_uint32 > 0)) negExif->fSubjectDistance = dng_urational(tmp_uint32, 100);
     if (getInputExifTag("Exif.Canon.SerialNumber", 0, &tmp_uint32)) {
@@ -200,9 +192,7 @@ void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNo
     if (negExif->fISOSpeedRatings[0] == 0) 
         getInterpretedInputExifTag("Exif.CanonSi.ISOSpeed", 0, &negExif->fISOSpeedRatings[0]);
 
-    // -----------------------------------------------------------------------------------------
     // Pentax Makernotes
-
     uint32 pentaxLensId1, pentaxLensId2;
     getInputExifTag("Exif.Pentax.LensType", &negExif->fLensName);
     if ((getInputExifTag("Exif.Pentax.LensType", 0, &pentaxLensId1)) && (getInputExifTag("Exif.Pentax.LensType", 1, &pentaxLensId2))) {
@@ -215,18 +205,14 @@ void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNo
     if (negExif->fISOSpeedRatings[0] == 0) 
         getInterpretedInputExifTag("Exif.Pentax.ISO", 0, &negExif->fISOSpeedRatings[0]);
 
-    // -----------------------------------------------------------------------------------------
     // Olympus Makernotes
-
     getInputExifTag("Exif.OlympusEq.SerialNumber", &negExif->fCameraSerialNumber);
     getInputExifTag("Exif.OlympusEq.LensSerialNumber", &negExif->fLensSerialNumber);
     getInputExifTag("Exif.OlympusEq.LensModel", &negExif->fLensName);
     if (getInputExifTag("Exif.OlympusEq.MinFocalLength", 0, &tmp_uint32)) negExif->fLensInfo[0] = dng_urational(tmp_uint32, 1);
     if (getInputExifTag("Exif.OlympusEq.MaxFocalLength", 0, &tmp_uint32)) negExif->fLensInfo[1] = dng_urational(tmp_uint32, 1);
 
-    // -----------------------------------------------------------------------------------------
     // Panasonic Makernotes
-
     getInputExifTag("Exif.Panasonic.LensType", &negExif->fLensName);
     getInputExifTag("Exif.Panasonic.LensSerialNumber", &negExif->fLensSerialNumber);
 
@@ -235,7 +221,6 @@ void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNo
         if (getInputExifTag("Exif.Panasonic.ProgramISO", 0, &tmp_uint32) && (tmp_uint32 != 65535))
             negExif->fISOSpeedRatings[0] = tmp_uint32;
 
-    // -----------------------------------------------------------------------------------------
     // Samsung Makernotes
 
     // checked
@@ -244,9 +229,7 @@ void VariousVendorProcessor::setExifFromRaw(const dng_date_time_info &dateTimeNo
     if ((negExif->fFocalLengthIn35mmFilm == 0) && getInputExifTag("Exif.Samsung2.FocalLengthIn35mmFormat", 0, &tmp_uint32))
         negExif->fFocalLengthIn35mmFilm = tmp_uint32 / 10;
 
-    // -----------------------------------------------------------------------------------------
     // Sony Makernotes
-
     if (getInputExifTag("Exif.Sony2.LensID", 0, &tmp_uint32)) setString(tmp_uint32, &negExif->fLensID);
 }
 

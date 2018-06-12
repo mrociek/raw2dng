@@ -18,19 +18,20 @@
 
 #pragma once
 
-#include "../processor.h"
+#include "../vendor_raw.h"
 
 
 // TODO/FIXME: Fuji support is currently broken!
 
-class FujiProcessor : VendorRawProcessor {
-
+class FujiProcessor : public VendorRawProcessor
+{
+friend class NegativeProcessor;
 public:
-   void setDNGPropertiesFromRaw();
+   void setDNGPropertiesFromInput();
    void buildDNGImage();
 
 protected:
-   FujiProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+   FujiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor);
 
    bool m_fujiRotate90;
 };

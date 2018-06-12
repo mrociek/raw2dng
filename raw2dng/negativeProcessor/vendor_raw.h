@@ -18,19 +18,23 @@
 
 #pragma once
 
-#include <dng_host.h>
-#include <dng_negative.h>
-#include <dng_exif.h>
-#include <exiv2/image.hpp>
+
+#include "rawexiv.h"
+
 
 class LibRaw;
 
-class VendorRawProcessor : NegativeProcessor {
+class VendorRawProcessor : public RawExiv2Processor
+{
 public:
+    ~VendorRawProcessor();
 protected:
+    VendorRawProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor);
     libraw_image_sizes_t* getSizeInfo() override;
     libraw_iparams_t* getImageParams() override;
     libraw_colordata_t* getColorData() override;
+    unsigned short* getRawBuffer() override;
+    uint32 getInputPlanes() override;
 
     AutoPtr<LibRaw> m_RawProcessor;
 };

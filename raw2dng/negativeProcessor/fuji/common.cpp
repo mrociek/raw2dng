@@ -29,14 +29,15 @@
 
 // TODO/FIXME: Fuji support is currently broken!
 
-FujiProcessor::FujiProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage)
-                           : NegativeProcessor(host, rawProcessor, rawImage) {
+FujiProcessor::FujiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor):
+    VendorRawProcessor(host, filename, inputImage, rawProcessor)
+{
     m_fujiRotate90 = (2 == m_RawProcessor->COLOR(0, 1)) && (1 == m_RawProcessor->COLOR(1, 0));
 }
 
 
-void FujiProcessor::setDNGPropertiesFromRaw() {
-    NegativeProcessor::setDNGPropertiesFromRaw();
+void FujiProcessor::setDNGPropertiesFromInput() {
+    VendorRawProcessor::setDNGPropertiesFromInput();
 
     libraw_image_sizes_t *sizes   = &m_RawProcessor->imgdata.sizes;
     libraw_iparams_t     *iparams = &m_RawProcessor->imgdata.idata;
@@ -72,7 +73,7 @@ void FujiProcessor::setDNGPropertiesFromRaw() {
 
 
 void FujiProcessor::buildDNGImage() {
-    NegativeProcessor::buildDNGImage();
+    VendorRawProcessor::buildDNGImage();
 
 // TODO: FIXME
 /*    if (m_fujiRotate90) {

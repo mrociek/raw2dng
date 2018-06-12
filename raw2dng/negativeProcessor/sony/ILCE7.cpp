@@ -160,12 +160,13 @@ public:
 };
 
 
-ILCE7processor::ILCE7processor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage)
-                             : NegativeProcessor(host, rawProcessor, rawImage) {}
+ILCE7processor::ILCE7processor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor):
+    VendorRawProcessor(host, filename, inputImage, rawProcessor)
+{}
 
 
-void ILCE7processor::setDNGPropertiesFromRaw() {
-    NegativeProcessor::setDNGPropertiesFromRaw();
+void ILCE7processor::setDNGPropertiesFromInput() {
+    VendorRawProcessor::setDNGPropertiesFromInput();
 
     // -----------------------------------------------------------------------------------------
     // Adjust default crop
@@ -233,8 +234,8 @@ void ILCE7processor::setDNGPropertiesFromRaw() {
 }
 
 
-void ILCE7processor::setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
-    NegativeProcessor::setExifFromRaw(dateTimeNow, appNameVersion);
+void ILCE7processor::setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
+    VendorRawProcessor::setExifFromInput(dateTimeNow, appNameVersion);
 
     dng_exif *negExif = m_negative->GetExif();
 
@@ -273,8 +274,8 @@ void ILCE7processor::setExifFromRaw(const dng_date_time_info &dateTimeNow, const
 }
 
 
-void ILCE7processor::setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
-    NegativeProcessor::setXmpFromRaw(dateTimeNow, appNameVersion);
+void ILCE7processor::setXmpFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) {
+    VendorRawProcessor::setXmpFromInput(dateTimeNow, appNameVersion);
 
     dng_xmp *negXmp = m_negative->GetXMP();
 
@@ -302,7 +303,7 @@ void ILCE7processor::setXmpFromRaw(const dng_date_time_info &dateTimeNow, const 
 
 
 dng_memory_stream* ILCE7processor::createDNGPrivateTag() {
-    dng_memory_stream *streamPriv = NegativeProcessor::createDNGPrivateTag();
+    dng_memory_stream *streamPriv = VendorRawProcessor::createDNGPrivateTag();
 
     if (!streamPriv) return NULL;
 
@@ -325,7 +326,7 @@ dng_memory_stream* ILCE7processor::createDNGPrivateTag() {
     for (int i = 0;   i < 8;   i++) SR2IFD[i] = IFDstart[i];
     for (int i = 110; i < 113; i++) SR2IFD[i] = IFDend[i - 110];
 
-    Exiv2::BasicIo *io = &m_RawImage->io();
+    Exiv2::BasicIo *io = &m_InputImage->io();
     Exiv2::ExifData ee; Exiv2::IptcData ii; Exiv2::XmpData xx;
     try {
         io->open();

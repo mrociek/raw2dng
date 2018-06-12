@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 Fimagena
+/* Copyright (C) 2018 Dmitrii Nikishov
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,32 +18,27 @@
 
 #pragma once
 
-#include "processor.h"
 
-#include <stdexcept>
-
-#include <dng_simple_image.h>
-#include <dng_camera_profile.h>
-#include <dng_file_stream.h>
-#include <dng_memory_stream.h>
-#include <dng_xmp.h>
-
-#include <zlib.h>
-
-#include <exiv2/xmp.hpp>
+#include "../rawexiv.h"
 
 
-class DNGprocessor : public NegativeProcessor {
+
+class XiaomiYiProcessor : public RawExiv2Processor
+{
 friend class NegativeProcessor;
-
 public:
-   void setDNGPropertiesFromInput() override;
-   void setCameraProfile(const char *dcpFilename) override;
-   void setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) override;
-   void setXmpFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) override;
-   void backupProprietaryData() override;
-   void buildDNGImage() override;
-
+    virtual void setDNGPropertiesFromInput() override;
 protected:
-   DNGprocessor(AutoPtr<dng_host> &host, std::string filename);
+    XiaomiYiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage);
+    libraw_image_sizes_t* getSizeInfo() override;
+    libraw_iparams_t* getImageParams() override;
+    libraw_colordata_t* getColorData() override;
+    unsigned short* getRawBuffer() override;
+    uint32 getInputPlanes() override;
+    virtual void loadBayerData();
+
+    std::vector<unsigned short> bayerData;
+    libraw_image_sizes_t image_sizes;
+    libraw_iparams_t image_params;
+    libraw_colordata_t image_colordata;
 };

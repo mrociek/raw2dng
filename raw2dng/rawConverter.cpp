@@ -78,13 +78,23 @@ void RawConverter::registerPublisher(std::function<void(const char*)> publisher)
 }
 
 
-void RawConverter::openRawFile(const std::string rawFilename) {
+void RawConverter::openRawFile(std::string rawFilename) {
     // -----------------------------------------------------------------------------------------
     // Create processor and parse raw files
 
     if (m_publishFunction != NULL) m_publishFunction("parsing raw file");
 
-    m_negProcessor.Reset(NegativeProcessor::createProcessor(m_host, rawFilename.c_str()));
+    m_negProcessor.Reset(NegativeProcessor::createProcessor(m_host, rawFilename));
+}
+
+
+void RawConverter::openRawFile(std::string rawFilename, std::string xiaomiJpgFilename) {
+    // -----------------------------------------------------------------------------------------
+    // Create processor and parse raw files
+
+    if (m_publishFunction != NULL) m_publishFunction("parsing raw file");
+
+    m_negProcessor.Reset(NegativeProcessor::createProcessor(m_host, rawFilename, xiaomiJpgFilename));
 }
 
 
@@ -94,12 +104,12 @@ void RawConverter::buildNegative(const std::string dcpFilename) {
 
     if (m_publishFunction != NULL) m_publishFunction("processing metadata");
 
-    m_negProcessor->setDNGPropertiesFromRaw();
+    m_negProcessor->setDNGPropertiesFromInput();
     m_negProcessor->setCameraProfile(dcpFilename.c_str());
 
     dng_string appNameVersion(m_appName); appNameVersion.Append(" "); appNameVersion.Append(m_appVersion.Get());
-    m_negProcessor->setExifFromRaw(m_dateTimeNow, appNameVersion);
-    m_negProcessor->setXmpFromRaw(m_dateTimeNow, appNameVersion);
+    m_negProcessor->setExifFromInput(m_dateTimeNow, appNameVersion);
+    m_negProcessor->setXmpFromInput(m_dateTimeNow, appNameVersion);
 
     m_negProcessor->getNegative()->RebuildIPTC(true);
 
@@ -116,7 +126,7 @@ void RawConverter::buildNegative(const std::string dcpFilename) {
 
 void RawConverter::embedRaw(const std::string rawFilename) {
     if (m_publishFunction != NULL) m_publishFunction("embedding raw file");
-    m_negProcessor->embedOriginalRaw(rawFilename.c_str());
+    m_negProcessor->embedOriginalFile(rawFilename.c_str());
 }
 
 

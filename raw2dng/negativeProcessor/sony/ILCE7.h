@@ -18,18 +18,19 @@
 
 #pragma once
 
-#include "../processor.h"
+#include "../vendor_raw.h"
 
 
-class ILCE7processor : VendorRawProcessor {
-
+class ILCE7processor : public VendorRawProcessor
+{
+friend class NegativeProcessor;
 public:
-   void setDNGPropertiesFromRaw();
-   void setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
-   void setXmpFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
+    void setDNGPropertiesFromInput();
+    void setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
+    void setXmpFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
 
 protected:
-   ILCE7processor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+    ILCE7processor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor);
 
-   dng_memory_stream* createDNGPrivateTag();
+    dng_memory_stream* createDNGPrivateTag();
 };

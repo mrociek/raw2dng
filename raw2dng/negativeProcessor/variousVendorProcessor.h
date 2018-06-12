@@ -18,15 +18,16 @@
 
 #pragma once
 
-#include "processor.h"
+#include "vendor_raw.h"
 
 
-class VariousVendorProcessor : VendorRawProcessor {
-
+class VariousVendorProcessor : public VendorRawProcessor
+{
+friend class NegativeProcessor;
 public:
-   void setDNGPropertiesFromRaw();
-   void setExifFromRaw(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion);
+    virtual void setDNGPropertiesFromInput() override;
+    virtual void setExifFromInput(const dng_date_time_info &dateTimeNow, const dng_string &appNameVersion) override;
 
 protected:
-   VariousVendorProcessor(AutoPtr<dng_host> &host, LibRaw *rawProcessor, Exiv2::Image::AutoPtr &rawImage);
+    VariousVendorProcessor(AutoPtr<dng_host> &host,std::string filename, Exiv2::Image::AutoPtr &inputImage, LibRaw *rawProcessor);
 };
