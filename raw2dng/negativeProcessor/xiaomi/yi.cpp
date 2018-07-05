@@ -4,6 +4,7 @@
 #include "yi.h"
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 XiaomiYiProcessor::XiaomiYiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage):
     RawExiv2Processor(host, filename, inputImage)
