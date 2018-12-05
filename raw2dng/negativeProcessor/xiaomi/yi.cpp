@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
+
 
 XiaomiYiProcessor::XiaomiYiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage):
     RawExiv2Processor(host, filename, inputImage)
@@ -39,11 +41,26 @@ XiaomiYiProcessor::XiaomiYiProcessor(AutoPtr<dng_host> &host, std::string filena
     image_params.cdesc[3] = 'G';
     image_params.filters = 0xb4b4b4b4;
 
-    image_colordata.black = 0;
+    // Black level. Very important: directly affects color cast.
+    // 768 seems to work very good with ISO 100.
+    // Can be adjusted later with
+    // exiftool -SubIFD:BlackLevel="xxx xxx xxx xxx" file.dng
+    //TODO: seems to vary with ISO, further testing is required
+    image_colordata.black = 768;
+
+    //TODO: research if saturation signal from Sony IMX206 spec page is relevant:
+    // is it possible to limit the max value to avoid color fringing
     image_colordata.maximum = 16383;
-    //image_colordata.cblack = {0, 0, 0, 0, 0};
-    //image_colordata.cam_mul = {1.0, 1.0, 1.0};
-    //image_colordata.cam_xyz = ;
+
+    // White balance multipliers. The YI camera uses GWA to determine
+    // WB gains. These are stored in TXT -- debug_dump 11: ~(1<<3) in following format:
+    // wb_gains.[rgb]_gain: an integer that needs to be divided by 4096 to get
+    // actual gain. g_gain is usually 4096.
+    // If no TXT file is available, no problem, it's possible to remove the color cast
+    // in raw converter, given that black level is correct.
+    image_colordata.cam_mul[0] = 1;
+    image_colordata.cam_mul[1] = 1;
+    image_colordata.cam_mul[2] = 1;
 
     loadBayerData();
 }
@@ -91,12 +108,4 @@ void XiaomiYiProcessor::loadBayerData()
         bayerData.push_back(pixelVal);
     }
     printf("Successfully loaded %d pixel values", bayerData.size());
-}
-
-
-void XiaomiYiProcessor::setDNGPropertiesFromInput() {
-    RawExiv2Processor::setDNGPropertiesFromInput();
-    //printf("Resetting crop\n");
-    //m_negative->SetDefaultCropOrigin(0, 0);
-    //m_negative->SetDefaultCropSize(image_sizes.width, image_sizes.height);
 }

@@ -26,8 +26,6 @@
 class XiaomiYiProcessor : public RawExiv2Processor
 {
 friend class NegativeProcessor;
-public:
-    virtual void setDNGPropertiesFromInput() override;
 protected:
     XiaomiYiProcessor(AutoPtr<dng_host> &host, std::string filename, Exiv2::Image::AutoPtr &inputImage);
     libraw_image_sizes_t* getSizeInfo() override;
