@@ -23,6 +23,7 @@
 #include <dng_exif.h>
 #include <exiv2/image.hpp>
 #include <libraw/libraw_types.h>
+#include <functional>
 
 
 class LibRaw;
