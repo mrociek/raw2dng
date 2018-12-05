@@ -1,3 +1,9 @@
 
 raw2dng/config.h
 *.sw?
+CMakeFiles/
+CMakeCache.txt
+Makefile
+*.cmake
+*.a
+raw2dng/raw2dng
