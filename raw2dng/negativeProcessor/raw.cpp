@@ -158,6 +158,7 @@ void RawProcessor::setCameraProfile(const char *dcpFilename) {
         int colors = idata->colors;
         if ((colors == 3) || (colors = 4)) {
 	        dng_matrix *colormatrix1 = new dng_matrix(colors, 3);
+                dng_matrix *colormatrix2;
 
         	for (int i = 0; i < colors; i++)
         		for (int j = 0; j < 3; j++)
@@ -167,11 +168,23 @@ void RawProcessor::setCameraProfile(const char *dcpFilename) {
                 printf("Warning, camera XYZ Matrix is null\n");
                 delete colormatrix1;
                 if (colors == 3)
-                	colormatrix1 = new dng_matrix_3by3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+                {
+                    colormatrix1 = new dng_matrix_3by3(0.9490, -0.3814, -0.0225,
+                                                       -0.6649, 1.3741, 0.3236,
+                                                       -0.0627, 0.0796, 0.7550);
+                    colormatrix2 = new dng_matrix_3by3(0.8489, -0.2583, -0.1036,
+                                                       -0.8051, 1.5583, 0.2643,
+                                                       -0.1307, 0.1407, 0.7354);
+                }
                 else
-                	colormatrix1 = new dng_matrix_4by3(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+                // TODO: not specified atm
+                {
+                    colormatrix1 = new dng_matrix_4by3(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+                    colormatrix2 = new dng_matrix_4by3(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
+                }
             }
             prof->SetColorMatrix1(*colormatrix1);
+            prof->SetColorMatrix2(*colormatrix2);
         }
         prof->SetProfileCalibrationSignature("com.fimagena.raw2dng");
     }
