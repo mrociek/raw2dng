@@ -120,7 +120,7 @@ void RawProcessor::setDNGPropertiesFromInput()
                                   colors->black + colors->cblack[2],
                                   colors->black + colors->cblack[3]);
     else 
-    	m_negative->SetBlackLevel(colors->black + colors->cblack[0], 0);
+        m_negative->SetBlackLevel(colors->black + colors->cblack[0], 0);
 
     // Fixed properties
     m_negative->SetBaselineExposure(0.0);                       // should be fixed per camera
@@ -157,12 +157,12 @@ void RawProcessor::setCameraProfile(const char *dcpFilename) {
 
         int colors = idata->colors;
         if ((colors == 3) || (colors = 4)) {
-	        dng_matrix *colormatrix1 = new dng_matrix(colors, 3);
-                dng_matrix *colormatrix2;
+            dng_matrix *colormatrix1 = new dng_matrix(colors, 3);
+            dng_matrix *colormatrix2 = NULL;
 
-        	for (int i = 0; i < colors; i++)
-        		for (int j = 0; j < 3; j++)
-        			(*colormatrix1)[i][j] = colordata->cam_xyz[i][j];
+            for (int i = 0; i < colors; i++)
+                for (int j = 0; j < 3; j++)
+                    (*colormatrix1)[i][j] = colordata->cam_xyz[i][j];
 
             if (colormatrix1->MaxEntry() == 0.0) {
                 printf("Warning, camera XYZ Matrix is null\n");
@@ -183,8 +183,11 @@ void RawProcessor::setCameraProfile(const char *dcpFilename) {
                     colormatrix2 = new dng_matrix_4by3(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
                 }
             }
+
             prof->SetColorMatrix1(*colormatrix1);
-            prof->SetColorMatrix2(*colormatrix2);
+            if (colormatrix2 != NULL) {
+                prof->SetColorMatrix2(*colormatrix2);
+            }
         }
         prof->SetProfileCalibrationSignature("com.fimagena.raw2dng");
     }

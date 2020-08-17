@@ -35,6 +35,7 @@ public:
 
    void openRawFile(const std::string rawFilename);
    void openRawFile(const std::string rawFilename, const std::string xiaomiJpgFilename);
+   void openRawFile(const std::string rawFilename, const std::string greenFilename, const std::string blueFilename);
    void buildNegative(const std::string dcpFilename);
    void embedRaw(const std::string rawFilename);
    void renderImage();

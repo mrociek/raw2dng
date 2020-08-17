@@ -38,6 +38,15 @@ void raw2dng(std::string rawFilename, std::string outFilename, std::string dcpFi
     converter.writeDng(outFilename);
 }
 
+void raw2dngMerge(std::string rawFilename, std::string outFilename, std::string dcpFilename, std::string greenFilename, std::string blueFilename) {
+    RawConverter converter;
+    converter.openRawFile(rawFilename, greenFilename, blueFilename);
+    converter.buildNegative(dcpFilename);
+    converter.renderImage();
+    converter.renderPreviews();
+    converter.writeDng(outFilename);
+}
+
 
 void xiaomi_raw2dng(std::string rawFilename, std::string jpgFilename, std::string outFilename, std::string dcpFilename) {
     RawConverter converter;
@@ -79,6 +88,8 @@ int main(int argc, const char* argv []) {
                      "  -a7 <filename>       convert RAW from Ambarella A7-based cameras, requires a jpg file for exif data source\n"
                      "  -j                   convert to JPEG instead of DNG\n"
                      "  -t                   convert to TIFF instead of DNG\n"
+                     "  -g <filename>        specify DNG file with green channel data to use (works only when processing DNG)\n"
+                     "  -b <filename>        specify DNG file with blue channel data to use (works only when processing DNG)\n"
                      "  -o <filename>        specify output filename\n\n";
         return -1;
     }
@@ -89,6 +100,8 @@ int main(int argc, const char* argv []) {
     std::string outFilename;
     std::string dcpFilename;
     std::string jpgFilename;
+    std::string greenFilename;
+    std::string blueFilename;
     bool embedOriginal = false, isJpeg = false, isTiff = false;
 
     int index;
@@ -97,6 +110,8 @@ int main(int argc, const char* argv []) {
         if (0 == strcmp(option.c_str(), "o"))   outFilename = std::string(argv[++index]);
         if (0 == strcmp(option.c_str(), "dcp")) dcpFilename = std::string(argv[++index]);
         if (0 == strcmp(option.c_str(), "a7")) jpgFilename = std::string(argv[++index]);
+        if (0 == strcmp(option.c_str(), "g"))   greenFilename = std::string(argv[++index]);
+        if (0 == strcmp(option.c_str(), "b"))   blueFilename = std::string(argv[++index]);
         if (0 == strcmp(option.c_str(), "e"))   embedOriginal = true;
         if (0 == strcmp(option.c_str(), "j"))   isJpeg = true;
         if (0 == strcmp(option.c_str(), "t"))   isTiff = true;
@@ -128,6 +143,7 @@ int main(int argc, const char* argv []) {
     try {
         if (isJpeg)      raw2jpeg(rawFilename, outFilename, dcpFilename);
         else if (isTiff) raw2tiff(rawFilename, outFilename, dcpFilename);
+        else if (!greenFilename.empty() || !blueFilename.empty()) raw2dngMerge(rawFilename, outFilename, dcpFilename, greenFilename, blueFilename);
         else if (jpgFilename.empty()) raw2dng (rawFilename, outFilename, dcpFilename, embedOriginal);
         else xiaomi_raw2dng(rawFilename, jpgFilename, outFilename, dcpFilename);
     }

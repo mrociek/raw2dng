@@ -97,6 +97,15 @@ void RawConverter::openRawFile(std::string rawFilename, std::string xiaomiJpgFil
     m_negProcessor.Reset(NegativeProcessor::createProcessor(m_host, rawFilename, xiaomiJpgFilename));
 }
 
+void RawConverter::openRawFile(std::string rawFilename, std::string greenFilename, std::string blueFilename) {
+    // -----------------------------------------------------------------------------------------
+    // Create processor and parse raw files
+
+    if (m_publishFunction != NULL) m_publishFunction("parsing raw file");
+
+    m_negProcessor.Reset(NegativeProcessor::createProcessor(m_host, rawFilename, greenFilename, blueFilename));
+}
+
 
 void RawConverter::buildNegative(const std::string dcpFilename) {
     // -----------------------------------------------------------------------------------------

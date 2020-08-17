@@ -22,6 +22,7 @@
 
 #include "processor.h"
 #include "dng_input.h"
+#include "dng_merge_input.h"
 #include "sony/ILCE7.h"
 #include "fuji/common.h"
 #include "xiaomi/yi.h"
@@ -82,6 +83,17 @@ NegativeProcessor* NegativeProcessor::createProcessor(AutoPtr<dng_host> &host, s
     }
 
     return new XiaomiYiProcessor(host, filename, inputImage);
+}
+
+NegativeProcessor* NegativeProcessor::createProcessor(AutoPtr<dng_host> &host, std::string& filename, std::string& greenFilename, std::string& blueFilename)
+{
+    try {
+        return new DNGMergeProcessor(host, filename, greenFilename, blueFilename);
+    }
+    catch (dng_exception &e) {
+        std::stringstream error; error << "Cannot parse source DNG-file (" << e.ErrorCode() << ": " << getDngErrorMessage(e.ErrorCode()) << ")";
+        throw std::runtime_error(error.str());
+    }
 }
 
 

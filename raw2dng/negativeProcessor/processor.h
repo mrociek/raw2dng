@@ -34,6 +34,7 @@ class NegativeProcessor {
 public:
    static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, std::string& filename);
    static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, std::string& filename, std::string& jpgFilename);
+   static NegativeProcessor* createProcessor(AutoPtr<dng_host> &host, std::string& filename, std::string& greenFilename, std::string& blueFilename);
    //virtual ~NegativeProcessor();
 
    dng_negative* getNegative() {return m_negative.Get();}
